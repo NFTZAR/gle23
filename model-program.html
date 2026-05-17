@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Program | StreamVault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080808;
+    --surface: #111;
+    --surface2: #161616;
+    --border: #242424;
+    --accent: #ff6b2b;
+    --accent2: #ffb347;
+    --pink: #ff4d8d;
+    --text: #f0ede8;
+    --muted: #7a7a7a;
+    --muted2: #555;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(8,8,8,0.96);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px;
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.35rem; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  nav ul { list-style: none; display: flex; gap: 28px; align-items: center; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color .2s; }
+  nav a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--pink) !important; color: #fff !important;
+    padding: 8px 20px; border-radius: 6px; font-weight: 600 !important;
+    transition: opacity .2s, transform .1s !important;
+  }
+  .nav-cta:hover { opacity: .9 !important; transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    position: relative; min-height: 92vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 80px 40px 60px; overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 100%, rgba(255,77,141,0.13) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 20% 20%, rgba(255,107,43,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 80% 10%, rgba(255,179,71,0.06) 0%, transparent 60%);
+  }
+  .hero-noise {
+    position: absolute; inset: 0; opacity: .03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    background-size: 200px;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,77,141,0.1); border: 1px solid rgba(255,77,141,0.25);
+    color: var(--pink); font-size: .72rem; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    padding: 6px 16px; border-radius: 100px; margin-bottom: 28px;
+    animation: fadeUp .5s ease both;
+  }
+  .hero-eyebrow::before {
+    content: ''; width: 6px; height: 6px; background: var(--pink);
+    border-radius: 50%; animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    font-weight: 800; letter-spacing: -3px; line-height: 1;
+    margin-bottom: 28px;
+    animation: fadeUp .5s .1s ease both;
+  }
+  .hero h1 .pink { color: var(--pink); }
+  .hero h1 .orange { color: var(--accent); }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2vw, 1.25rem); color: var(--muted);
+    max-width: 560px; font-weight: 300; line-height: 1.65;
+    margin-bottom: 48px;
+    animation: fadeUp .5s .2s ease both;
+  }
+
+  .hero-btns {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 72px;
+    animation: fadeUp .5s .3s ease both;
+  }
+
+  .btn-primary {
+    background: var(--pink); color: #fff; border: none;
+    padding: 15px 36px; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600;
+    cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: opacity .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 0 40px rgba(255,77,141,0.35);
+  }
+  .btn-primary:hover { opacity: .9; transform: translateY(-2px); box-shadow: 0 8px 50px rgba(255,77,141,.45); }
+
+  .btn-ghost {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border); padding: 15px 36px; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500;
+    cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: border-color .2s, background .2s;
+  }
+  .btn-ghost:hover { background: var(--surface2); border-color: #3a3a3a; }
+
+  /* STATS */
+  .hero-stats {
+    display: flex; gap: 64px; justify-content: center; flex-wrap: wrap;
+    animation: fadeUp .5s .4s ease both;
+  }
+  .hero-stat { text-align: center; }
+  .hero-stat-num {
+    font-family: 'Syne', sans-serif; font-size: 2.4rem; font-weight: 800;
+    color: var(--text); display: block; line-height: 1; margin-bottom: 6px;
+  }
+  .hero-stat-num span { color: var(--pink); }
+  .hero-stat-label { font-size: .78rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; font-weight: 500; }
+
+  /* SECTION WRAPPER */
+  .section { padding: 100px 48px; max-width: 1080px; margin: 0 auto; }
+  .section-label {
+    font-size: .68rem; font-weight: 700; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--pink); margin-bottom: 12px;
+  }
+  h2 {
+    font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 800; letter-spacing: -1px; margin-bottom: 14px; line-height: 1.1;
+  }
+  .section-intro { color: var(--muted); max-width: 520px; margin-bottom: 60px; font-size: 1.05rem; font-weight: 300; }
+
+  /* FEATURE GRID */
+  .feature-group { margin-bottom: 72px; }
+  .feature-group-title {
+    font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 700;
+    margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  .feature-group-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; background: var(--border); border-radius: 14px; overflow: hidden; }
+  .feature-card {
+    background: var(--surface); padding: 36px 32px;
+    transition: background .2s;
+    position: relative; overflow: hidden;
+  }
+  .feature-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,77,141,0.04) 0%, transparent 60%);
+    opacity: 0; transition: opacity .3s;
+  }
+  .feature-card:hover { background: var(--surface2); }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-icon { font-size: 1.8rem; margin-bottom: 16px; display: block; }
+  .feature-card h3 { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+  .feature-card p { font-size: .875rem; color: var(--muted); line-height: 1.65; }
+
+  /* TESTIMONIALS */
+  .testimonials-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 100px 48px;
+  }
+  .testimonials-inner { max-width: 1080px; margin: 0 auto; }
+  .testimonials-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    margin-top: 56px;
+  }
+  .testimonial {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 14px;
+    padding: 32px; display: flex; flex-direction: column; gap: 20px;
+    transition: border-color .2s, transform .2s;
+  }
+  .testimonial:hover { border-color: rgba(255,77,141,.3); transform: translateY(-4px); }
+  .testimonial-quote {
+    font-size: .9rem; color: #bbb; line-height: 1.7;
+    font-style: italic; flex: 1;
+  }
+  .testimonial-quote::before { content: '"'; color: var(--pink); font-size: 1.5rem; font-style: normal; display: block; margin-bottom: 8px; line-height: 1; }
+  .testimonial-author { display: flex; align-items: center; gap: 14px; }
+  .testimonial-avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink) 0%, var(--accent) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: .95rem;
+    color: #fff; flex-shrink: 0;
+  }
+  .testimonial-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem; }
+  .testimonial-meta { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+
+  /* EARNINGS HIGHLIGHT */
+  .earnings-band {
+    background: linear-gradient(135deg, rgba(255,77,141,0.1) 0%, rgba(255,107,43,0.06) 100%);
+    border: 1px solid rgba(255,77,141,0.2);
+    border-radius: 16px; padding: 56px; margin: 0 48px;
+    display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: center;
+    max-width: 1080px; margin-left: auto; margin-right: auto;
+  }
+  .earnings-band h2 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -1px; }
+  .earnings-band p { color: var(--muted); font-size: .95rem; font-weight: 300; max-width: 480px; line-height: 1.7; }
+  .earnings-nums { display: flex; gap: 40px; flex-wrap: wrap; justify-content: flex-end; }
+  .earning-num { text-align: right; }
+  .earning-num-val { font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--pink); display: block; line-height: 1; }
+  .earning-num-label { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; }
+
+  /* FAQ */
+  .faq-section { max-width: 760px; margin: 0 auto; padding: 100px 48px; }
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+  }
+  .faq-q {
+    width: 100%; background: none; border: none; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500;
+    text-align: left; padding: 24px 0; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    transition: color .2s;
+  }
+  .faq-q:hover { color: var(--pink); }
+  .faq-icon {
+    width: 24px; height: 24px; border: 1px solid var(--border); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .8rem; flex-shrink: 0; transition: background .2s, border-color .2s, transform .3s;
+    color: var(--muted);
+  }
+  .faq-item.open .faq-icon { background: var(--pink); border-color: var(--pink); color: #fff; transform: rotate(45deg); }
+  .faq-a {
+    max-height: 0; overflow: hidden;
+    transition: max-height .4s cubic-bezier(.4,0,.2,1), padding .3s;
+  }
+  .faq-item.open .faq-a { max-height: 600px; }
+  .faq-a-inner { padding-bottom: 24px; font-size: .9rem; color: var(--muted); line-height: 1.75; }
+  .faq-a-inner strong { color: var(--text); }
+
+  /* STEPS */
+  .steps-section { max-width: 1080px; margin: 0 auto; padding: 0 48px 100px; }
+  .steps-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--border); border-radius: 14px; overflow: hidden; }
+  .step-card {
+    background: var(--surface); padding: 48px 36px; text-align: center;
+    transition: background .2s;
+  }
+  .step-card:hover { background: var(--surface2); }
+  .step-num-circle {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem;
+    color: #fff; margin: 0 auto 24px;
+    box-shadow: 0 0 24px rgba(255,77,141,.3);
+  }
+  .step-card h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+  .step-card p { font-size: .875rem; color: var(--muted); line-height: 1.6; }
+
+  .steps-cta { text-align: center; margin-top: 48px; }
+  .steps-cta p { color: var(--muted); font-size: .875rem; margin-top: 16px; }
+  .steps-cta a { color: var(--pink); text-decoration: none; }
+  .steps-cta a:hover { text-decoration: underline; }
+
+  /* FOOTER */
+  footer {
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 48px; display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 20px;
+  }
+  footer .logo { font-size: 1.1rem; }
+  .footer-links { display: flex; gap: 28px; flex-wrap: wrap; }
+  .footer-links a { color: var(--muted); text-decoration: none; font-size: .85rem; transition: color .2s; }
+  .footer-links a:hover { color: var(--text); }
+  .footer-copy { font-size: .8rem; color: var(--muted2); }
+
+  /* DIVIDER */
+  .full-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .testimonials-grid { grid-template-columns: 1fr 1fr; }
+    .earnings-band { grid-template-columns: 1fr; }
+    .earnings-nums { justify-content: flex-start; }
+    .earning-num { text-align: left; }
+  }
+  @media (max-width: 680px) {
+    nav ul { display: none; }
+    nav { padding: 0 24px; }
+    .hero { padding: 60px 24px 40px; }
+    .hero h1 { letter-spacing: -1.5px; }
+    .hero-stats { gap: 32px; }
+    .section, .faq-section, .steps-section { padding-left: 24px; padding-right: 24px; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .testimonials-section { padding: 60px 24px; }
+    .steps-row { grid-template-columns: 1fr; }
+    .earnings-band { padding: 36px 24px; margin: 0 24px; }
+    footer { flex-direction: column; align-items: flex-start; padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Stream<span>Vault</span></div>
+  <ul>
+    <li><a href="#revenue">Revenue</a></li>
+    <li><a href="#testimonials">Success Stories</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#signup" class="nav-cta">Join Now →</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-noise"></div>
+  <div class="hero-eyebrow">Model Program</div>
+  <h1>Billions of<br><span class="pink">reasons</span> to<br><span class="orange">join</span></h1>
+  <p class="hero-sub">With over 3 billion visits a month, earn ad revenue, sell your videos, and build a real fan base on the largest platform in the world.</p>
+  <div class="hero-btns">
+    <a href="#signup" class="btn-primary">Join the Model Program →</a>
+    <a href="#revenue" class="btn-ghost">Learn More</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="hero-stat-num">3<span>B</span></span>
+      <span class="hero-stat-label">Monthly Visits</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">600<span>K</span></span>
+      <span class="hero-stat-label">Active Creators</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">1<span>M</span></span>
+      <span class="hero-stat-label">Hours of Content</span>
+    </div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- REVENUE STREAMS -->
+<div id="revenue">
+  <div class="section">
+    <div class="section-label">Monetization</div>
+    <h2>Multiple Revenue Streams</h2>
+    <p class="section-intro">We built every monetization tool you need — so you can focus on creating, not chasing checks.</p>
+
+    <div class="feature-group">
+      <div class="feature-group-title">💰 Earn</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="feature-icon">📺</span>
+          <h3>Ad Revenue</h3>
+          <p>Earn a share of the advertising revenue generated by your free-to-watch videos. The more views, the more you make — automatically.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🏆</span>
+          <h3>$165K+ in Monthly Contest Prizes</h3>
+          <p>We run monthly viewer's choice contests, themed contests, and special events. Top creators take home real cash prizes every month.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🤝</span>
+          <h3>Referrals = $50</h3>
+          <p>Earn $50 for every model you refer who joins and gets verified. Build your network and get paid while you sleep.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🔄</span>
+          <h3>Export to Partner Sites</h3>
+          <p>Auto-export your content to partner platforms to multiply your earnings per video with zero extra work on your part.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-group">
+      <div class="feature-group-title">📣 Grow Your Brand</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="feature-icon">🌍</span>
+          <h3>Massive Traffic</h3>
+          <p>Tap into 3 billion monthly visits. New viewers discover your profile every single day without you lifting a finger.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📖</span>
+          <h3>Blogs & Video Tips</h3>
+          <p>Access our creator resource library — read, watch, and listen to expert tips on growing your audience and maximizing revenue.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📲</span>
+          <h3>Social Promotions</h3>
+          <p>Our social channels have over 4 million combined followers. Stand-out creators get featured and promoted to a massive built-in audience.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">💬</span>
+          <h3>Active Communities</h3>
+          <p>Join our Discord and Reddit communities. Promote your content, collaborate with fellow creators, and make real connections.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-group" style="margin-bottom:0;">
+      <div class="feature-group-title">🛡️ Content & Model Support</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="feature-icon">🎧</span>
+          <h3>Online Support for Creators</h3>
+          <p>Email us or reach us on social media any time. Our creator support team responds fast and actually knows what they're talking about.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🌐</span>
+          <h3>Geoblocking</h3>
+          <p>Keep your content hidden from specific countries or states. Full control over where your content is visible, always.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🔒</span>
+          <h3>DMCA & Fingerprinting</h3>
+          <p>Opt in to our content protection program. We actively monitor the top 50 tube sites to find and remove any stolen content.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📊</span>
+          <h3>Real-Time Earnings Dashboard</h3>
+          <p>Track views, revenue, fan club subscriptions, and video sales in real time. Know exactly where your money is coming from.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EARNINGS HIGHLIGHT BAND -->
+<div class="earnings-band">
+  <div>
+    <h2>Keep more of what you earn</h2>
+    <p>On ModelHub you keep 65% of all video sales and a full 80% of tips and fan club subscriptions. Our ad revenue share is among the highest in the industry — and it's paid monthly with no games.</p>
+  </div>
+  <div class="earnings-nums">
+    <div class="earning-num">
+      <span class="earning-num-val">80%</span>
+      <span class="earning-num-label">of Tips & Fan Clubs</span>
+    </div>
+    <div class="earning-num">
+      <span class="earning-num-val">65%</span>
+      <span class="earning-num-label">of Video Sales</span>
+    </div>
+    <div class="earning-num">
+      <span class="earning-num-val">$50</span>
+      <span class="earning-num-label">Per Referral</span>
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="testimonials-section" id="testimonials">
+  <div class="testimonials-inner">
+    <div class="section-label">Success Stories</div>
+    <h2>Don't just take our word for it</h2>
+    <div class="testimonials-grid">
+
+      <div class="testimonial">
+        <p class="testimonial-quote">The Model Program made me into a real creator. I trend worldwide, earn more than I ever imagined, and the platform's support is genuinely unmatched. If you put in the work, this program delivers.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">JJ</div>
+          <div>
+            <div class="testimonial-name">JADE_JORDAN</div>
+            <div class="testimonial-meta">124M views · 103K subscribers</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <p class="testimonial-quote">This program has literally changed my life. Unmatched ad revenue payouts, tons of awards, an amazing support team, and some of the best traffic on the web to get your brand out there.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">MR</div>
+          <div>
+            <div class="testimonial-name">MARK_ROCKWELL</div>
+            <div class="testimonial-meta">795M views · 240K subscribers</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <p class="testimonial-quote">The staff is so helpful and amazing, and they have monthly prizes for their creators! I could go on and on. I absolutely love being part of this community. It feels like a real family.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">JB</div>
+          <div>
+            <div class="testimonial-name">JENNYBLIGHE</div>
+            <div class="testimonial-meta">182M views · 261K subscribers</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <p class="testimonial-quote">Everyone is so nice, helpful, and supportive! We love that the program feels like a community of amazing like-minded people. Meeting new fans has been so rewarding and fun every single month.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">BR</div>
+          <div>
+            <div class="testimonial-name">BRYCI</div>
+            <div class="testimonial-meta">206M views · 440K subscribers</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <p class="testimonial-quote">It's nearly impossible to put into words what this platform means to us. The staff, fellow creators, and fans have allowed us to live a life beyond our wildest dreams. We're so grateful and excited to keep growing.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">LL</div>
+          <div>
+            <div class="testimonial-name">LINDSEYLOVE</div>
+            <div class="testimonial-meta">391M views · 548K subscribers</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <p class="testimonial-quote">I was skeptical at first, but after my first month the numbers spoke for themselves. The traffic is real, the earnings are real, and the community is genuinely one of a kind. Couldn't be happier.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">AV</div>
+          <div>
+            <div class="testimonial-name">AURORA_V</div>
+            <div class="testimonial-meta">88M views · 72K subscribers</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section" id="faq">
+  <div class="section-label">Common Questions</div>
+  <h2>Got Questions?</h2>
+
+  <div class="faq-item open">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      How much money will I make?
+      <span class="faq-icon">+</span>
+    </button>
+    <div class="faq-a">
+      <div class="faq-a-inner">
+        In the Model Program, you earn a percentage of the ad revenue generated by your verified videos. Your payout depends on ad performance — views, clicks, viewer geography, and ad rates all factor in.<br><br>
+        <strong>Example average RPMs:</strong> 2018 — $0.64 | 2017 — $0.69 | 2016 — $0.62 | 2015 — $0.44 per 1,000 views.<br><br>
+        On ModelHub: you keep <strong>65%</strong> of video sales and <strong>80%</strong> of tips and fan club subscriptions.
+      </div>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      How are earnings calculated?
+      <span class="faq-icon">+</span>
+    </button>
+    <div class="faq-a">
+      <div class="faq-a-inner">
+        We pay out 80%+ of the ad revenue your videos earn. Your earnings are based on views multiplied by the ad rate. The ad rate reflects the performance of ads around your video — including clicks, user country, and sales conversions.<br><br>
+        On ModelHub, the 65% revenue share is 80% of your net revenue after payment processing fees are deducted.
+      </div>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      How often do I get paid?
+      <span class="faq-icon">+</span>
+    </button>
+    <div class="faq-a">
+      <div class="faq-a-inner">
+        Payments are made <strong>monthly</strong> with a minimum withdrawal of <strong>$100 USD</strong>. If you earn less than $100 in a month, it rolls over to the next month.<br><br>
+        Payouts are processed in the first week of every month. Paxum payments typically arrive by the 2nd or 3rd week; checks by the 3rd week. You can update your payment method in your settings at any time before month-end.
+      </div>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      How do I verify I'm in my video?
+      <span class="faq-icon">+</span>
+    </button>
+    <div class="faq-a">
+      <div class="faq-a-inner">
+        Videos are only eligible for earnings if you appear in them. You must confirm this during the upload process. If there are other performers, you need a co-performer agreement on file — we may request it at any time.<br><br>
+        If you forgot to confirm during upload, email us the video link at <strong>models@streamvault.com</strong> and we'll update it.
+      </div>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">
+      What does my earnings dashboard show?
+      <span class="faq-icon">+</span>
+    </button>
+    <div class="faq-a">
+      <div class="faq-a-inner">
+        Your earnings tab breaks down: <strong>Free Video Earnings</strong> (ad rev), <strong>Viewshare Earnings</strong>, <strong>For Sale Video Earnings</strong>, <strong>Other Earnings</strong> (tips, fan clubs, custom videos), and your <strong>Total Month</strong> and <strong>All-Time Earnings</strong>.<br><br>
+        Earnings are recalculated daily — check back often. Pending earnings are estimates and may fluctuate slightly until finalized.
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top: 40px;">
+    <a href="#" class="btn-ghost">Browse All FAQs →</a>
+  </div>
+</div>
+
+<!-- SIGNUP STEPS -->
+<div class="steps-section" id="signup">
+  <div class="section-label">Get Started</div>
+  <h2>Signing up is fast and easy</h2>
+  <p class="section-intro" style="margin-bottom:40px;">Just 3 simple steps between you and your first paycheck.</p>
+
+  <div class="steps-row">
+    <div class="step-card">
+      <div class="step-num-circle">1</div>
+      <h3>Create a Free Account</h3>
+      <p>Sign up in under a minute. Just an email and a username to get started — no credit card required.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num-circle">2</div>
+      <h3>Submit Model Application</h3>
+      <p>Complete your model application with a short form and ID verification to confirm you're 18+.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num-circle">3</div>
+      <h3>Get Verified & Start Earning</h3>
+      <p>Once approved, upload your content and start earning from day one. We review applications within 72 hours.</p>
+    </div>
+  </div>
+
+  <div class="steps-cta">
+    <a href="#" class="btn-primary" style="font-size:1.05rem; padding: 16px 44px;">
+      Create Your Free Account →
+    </a>
+    <p>For issues or questions, contact <a href="mailto:models@streamvault.com">models@streamvault.com</a></p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">Stream<span>Vault</span></div>
+  <div class="footer-links">
+    <a href="#">Terms & Conditions</a>
+    <a href="#">Privacy Policy</a>
+    <a href="#">DMCA</a>
+    <a href="#">Content Removal</a>
+    <a href="#">Contact Support</a>
+    <a href="#">Content Partners</a>
+  </div>
+  <p class="footer-copy">© StreamVault, 2026</p>
+</footer>
+
+<script>
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // Subtle scroll reveal
+  const reveals = document.querySelectorAll('.feature-card, .testimonial, .step-card');
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        e.target.style.animation = `fadeUp 0.5s ${i * 0.05}s ease both`;
+        ro.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => ro.observe(el));
+</script>
+</body>
+</html>
